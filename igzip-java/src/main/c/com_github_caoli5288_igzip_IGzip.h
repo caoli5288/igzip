@@ -38,10 +38,26 @@ JNIEXPORT jint JNICALL Java_com_github_caoli5288_igzip_IGzip_compress__J_3BII_3B
 /*
  * Class:     com_github_caoli5288_igzip_IGzip
  * Method:    init
- * Signature: ([BIIII)J
+ * Signature: (JIII)J
  */
 JNIEXPORT jlong JNICALL Java_com_github_caoli5288_igzip_IGzip_init
-  (JNIEnv *, jclass, jbyteArray, jint, jint, jint, jint);
+  (JNIEnv *, jclass, jlong, jint, jint, jint);
+
+/*
+ * Class:     com_github_caoli5288_igzip_IGzip
+ * Method:    alloc
+ * Signature: ([BI)J
+ */
+JNIEXPORT jlong JNICALL Java_com_github_caoli5288_igzip_IGzip_alloc
+  (JNIEnv *, jclass, jbyteArray, jint);
+
+/*
+ * Class:     com_github_caoli5288_igzip_IGzip
+ * Method:    free
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_github_caoli5288_igzip_IGzip_free
+  (JNIEnv *, jclass, jlong);
 
 /*
  * Class:     com_github_caoli5288_igzip_IGzip

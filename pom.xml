@@ -5,7 +5,22 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.caoli5288.igzip</groupId>
-    <artifactId>igzip-java</artifactId>
+    <artifactId>igzip</artifactId>
     <version>0.1-SNAPSHOT</version>
+
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>igzip-java</module>
+        <module>igzip-linux-amd64</module>
+        <module>igzip-windows-amd64</module>
+    </modules>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>internal</id>
+            <url>http://ci.mengcraft.com:8082/repository/internal</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>
