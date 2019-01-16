@@ -10,10 +10,13 @@
 
     <packaging>pom</packaging>
 
+    <url>https://github.com/caoli5288/igzip-java</url>
+
     <modules>
         <module>igzip-java</module>
         <module>igzip-linux-amd64</module>
         <module>igzip-windows-amd64</module>
+        <module>igzip-all</module>
     </modules>
 
     <distributionManagement>

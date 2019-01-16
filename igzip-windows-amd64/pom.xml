@@ -11,4 +11,12 @@
 
     <artifactId>igzip-windows-amd64</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>${parent.groupId}</groupId>
+            <artifactId>igzip-java</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
+    </dependencies>
+
 </project>
