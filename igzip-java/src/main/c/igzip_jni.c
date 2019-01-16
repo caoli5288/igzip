@@ -22,9 +22,11 @@ JNIEXPORT jint JNICALL Java_com_github_caoli5288_igzip_IGzip_compress__J_3BII_3B
     isal_deflate_stateless(strm);
     jint ret = strm->total_out;
     /* cleanup */
-    (*env)->ReleasePrimitiveArrayCritical(env, in_arr, in, 0);
-    (*env)->ReleasePrimitiveArrayCritical(env, out_arr, out, 0);
     isal_deflate_reset(strm);
+    strm->next_in = NULL;
+    strm->next_out = NULL;
+    (*env)->ReleasePrimitiveArrayCritical(env, out_arr, out, 0);
+    (*env)->ReleasePrimitiveArrayCritical(env, in_arr, in, 0);
     return ret;
 }
 
@@ -38,20 +40,22 @@ JNIEXPORT jint JNICALL Java_com_github_caoli5288_igzip_IGzip_compress__JJIJI(JNI
     isal_deflate_stateless(strm);
     jint ret = strm->total_out;
     isal_deflate_reset(strm);
+    strm->next_in = NULL;
+    strm->next_out = NULL;
     return ret;
 }
 
 JNIEXPORT jlong JNICALL Java_com_github_caoli5288_igzip_IGzip_alloc(JNIEnv *env, jclass clz, jbyteArray arr, jint arr_len) {
     struct isal_zstream* strm = malloc(sizeof(struct isal_zstream));
-    isal_deflate_stateless_init(strm);
-    unsigned char* buf = (*env)->GetPrimitiveArrayCritical(env, arr, 0);
+    isal_deflate_init(strm);
+    unsigned char* buf = malloc(arr_len);
     strm->level_buf = buf;
     strm->level_buf_size = arr_len;
-    (*env)->ReleasePrimitiveArrayCritical(env, arr, buf, 0);
     return (jlong)strm;
 }
 
 JNIEXPORT void JNICALL Java_com_github_caoli5288_igzip_IGzip_free(JNIEnv *env, jclass clz, jlong ref) {
     struct isal_zstream* strm = (struct isal_zstream*)ref;
+    free(strm->level_buf);
     free(strm);
 }

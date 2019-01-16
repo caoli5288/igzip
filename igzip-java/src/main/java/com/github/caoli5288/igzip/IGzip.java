@@ -43,7 +43,6 @@ public class IGzip implements Closeable {
         }
     }
 
-    private byte[] deflateBuf;
     private long zstream;
     private int level;
     private int gzipFlag;
@@ -54,7 +53,7 @@ public class IGzip implements Closeable {
     }
 
     public IGzip(int level, int gzipFlag, int flushFlag) {
-        this.zstream = alloc(deflateBuf = new byte[256 * 1024], deflateBuf.length);
+        this.zstream = alloc(null, 262144);// 256k
         this.level = level;
         this.gzipFlag = gzipFlag;
         this.flushFlag = flushFlag;
@@ -93,7 +92,6 @@ public class IGzip implements Closeable {
         if (zstream != 0) {
             free(zstream);
             zstream = 0;
-            deflateBuf = null;
         }
     }
 
