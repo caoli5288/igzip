@@ -8,8 +8,9 @@ import java.io.InputStream;
 
 public class IGzip implements Closeable {
 
+    public static final int NO_COMPRESS = 0;
     public static final int BEST_SPEED = 1;
-    public static final int BEST_COMPRESSION = 9;
+    public static final int BEST_COMPRESSION = 3;
 
     public static final int FMT_DEFLATE = 0;
     public static final int FMT_GZIP = 1;
@@ -53,14 +54,17 @@ public class IGzip implements Closeable {
     }
 
     public IGzip(int level, int gzipFlag, int flushFlag) {
-        this.zstream = alloc(null, 262144);// 256k
+        zstream = alloc(null, -1);// Use default
+        if (zstream == 0) {
+            throw new IllegalStateException("Bad zstream return code");
+        }
         this.level = level;
         this.gzipFlag = gzipFlag;
         this.flushFlag = flushFlag;
     }
 
     public void setLevel(int level) {
-        this.level = level;
+        this.level = Math.min(Math.max(NO_COMPRESS, level), BEST_COMPRESSION);
     }
 
     public void setGzipFlag(int gzipFlag) {

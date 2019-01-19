@@ -47,8 +47,22 @@ JNIEXPORT jint JNICALL Java_com_github_caoli5288_igzip_IGzip_compress__JJIJI(JNI
 
 JNIEXPORT jlong JNICALL Java_com_github_caoli5288_igzip_IGzip_alloc(JNIEnv *env, jclass clz, jbyteArray arr, jint arr_len) {
     struct isal_zstream* strm = malloc(sizeof(struct isal_zstream));
+    if (strm == NULL) {
+        return 0;
+    }
     isal_deflate_init(strm);
+    if (arr_len < 0) {
+        arr_len = ISAL_DEF_LVL1_DEFAULT;
+    } else if (arr_len < ISAL_DEF_LVL1_MIN) {
+        arr_len = ISAL_DEF_LVL1_MIN;
+    } else if (arr_len > ISAL_DEF_LVL1_EXTRA_LARGE) {
+        arr_len = ISAL_DEF_LVL1_EXTRA_LARGE;
+    }
     unsigned char* buf = malloc(arr_len);
+    if (buf == NULL) {
+        free(strm);
+        return 0;
+    }
     strm->level_buf = buf;
     strm->level_buf_size = arr_len;
     return (jlong)strm;
