@@ -17,6 +17,7 @@
         <module>igzip-linux-amd64</module>
         <module>igzip-windows-amd64</module>
         <module>igzip-all</module>
+        <module>benchmarks</module>
     </modules>
 
     <distributionManagement>
