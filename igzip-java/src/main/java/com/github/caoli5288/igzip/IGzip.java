@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 
 public class IGzip implements Closeable {
 
@@ -23,24 +24,11 @@ public class IGzip implements Closeable {
     public static final int FULL_FLUSH = 3;
 
     static {
-        String system = System.getProperties().getProperty("os.name", "");
-        if (system.startsWith("Lin")) {
-            if (System.getProperties().getProperty("os.arch", "").equals("amd64")) {
-                try {
-                    loadLibrary("libigzip_jni.so", File.createTempFile("libigzip_jni_", ".so"));
-                } catch (IOException e) {
-                    System.err.println(e.getMessage());
-                }
-            }
-        }
-        if (system.startsWith("Win")) {
-            if (System.getProperties().getProperty("os.arch", "").equals("amd64")) {
-                try {
-                    loadLibrary("igzip_jni.dll", File.createTempFile("igzip_jni_", ".dll"));
-                } catch (IOException e) {
-                    System.err.println(e.getMessage());
-                }
-            }
+        try {
+            File tmp = File.createTempFile("igzip_jni.", ".jnilib");
+            loadLibrary(System.mapLibraryName("igzip_jni"), tmp);
+            tmp.deleteOnExit();
+        } catch (IOException ignore) {
         }
     }
 
@@ -122,13 +110,15 @@ public class IGzip implements Closeable {
 
     private static void loadLibrary(String res, File tmp) throws IOException {
         InputStream lib = IGzip.class.getClassLoader().getResourceAsStream(res);
-        if (lib == null) {
-            throw new IOException("Library not found: " + res);
-        }
-        tmp.deleteOnExit();
+        Objects.requireNonNull(lib, "Library not found: " + res);
         FileOutputStream tmpStr = new FileOutputStream(tmp);
-        while (lib.available() != 0) {
-            tmpStr.write(lib.read());
+        byte[] buf = new byte[255];
+        for (; ; ) {
+            int len = lib.read(buf);
+            if (len == -1) {
+                break;
+            }
+            tmpStr.write(buf, 0, len);
         }
         tmpStr.flush();
         tmpStr.close();
