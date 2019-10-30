@@ -1,6 +1,10 @@
 import: java8
 mode: dll
+
+flag: -s
 flag: -O3
+
+inc: isa-l/include
 
 src: igzip-java/src/main/c/igzip_jni.c
 
