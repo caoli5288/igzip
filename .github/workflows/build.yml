@@ -12,8 +12,8 @@ jobs:
 
     - name: build
       run: |
-        apt update
-        apt install build-essential autoconf automake libtool nasm yasm openjdk-8-jdk mingw-w64
+        sudo apt update
+        sudo apt install build-essential autoconf automake libtool nasm yasm openjdk-8-jdk mingw-w64
         wget https://github.com/intel/isa-l/archive/master.zip
         unzip master.zip
         cp Makefile.am isa-l-master/
