@@ -2,7 +2,7 @@ name: builder
 
 on:
   push:
-    branches: [ master ]
+    branches: []
 
 jobs:
   build:
@@ -17,6 +17,7 @@ jobs:
         wget https://github.com/intel/isa-l/archive/master.zip
         unzip master.zip
         cp Makefile.am isa-l-master/
+        cp -a ../igzip-java/src/main/c isa-l-master/
         mkdir out
         # build linux
         cp -a isa-l-master build
@@ -24,20 +25,16 @@ jobs:
         ./autogen.sh
         CFLAGS="-O3 -fPIC" ./configure
         make -j`nproc`
-        cp -a ../igzip-java/src/main/c c
-        cd c/
-        gcc -shared -s -O3 -I ../include/ -I /usr/lib/jvm/java-1.8.0-openjdk-amd64/include/ -I /usr/lib/jvm/java-1.8.0-openjdk-amd64/include/linux/ igzip_jni.c ../.libs/libisal.a -o ../../out/libigzip_jni.so
+        gcc -shared -s -O3 -I include/ -I /usr/lib/jvm/java-1.8.0-openjdk-amd64/include/ -I /usr/lib/jvm/java-1.8.0-openjdk-amd64/include/linux/ c/igzip_jni.c .libs/libisal.a -o ../out/libigzip_jni.so
         # build windows
-        cd ../../
+        cd ../
         rm -rf build
         cp -a isa-l-master build
         cd build
         ./autogen.sh
         CFLAGS="-O3 -fPIC" ./configure --host=x86_64-w64-mingw32
         make -j`nproc`
-        cp -a ../igzip-java/src/main/c c
-        cd c/
-        x86_64-w64-mingw32-gcc -shared -s -O3 -I ../include/ -I /usr/lib/jvm/java-1.8.0-openjdk-amd64/include/ -I /usr/lib/jvm/java-1.8.0-openjdk-amd64/include/linux/ igzip_jni.c ../.libs/libisal.a -o ../../out/igzip_jni.dll
+        x86_64-w64-mingw32-gcc -shared -s -O3 -I include/ -I /usr/lib/jvm/java-1.8.0-openjdk-amd64/include/ -I /usr/lib/jvm/java-1.8.0-openjdk-amd64/include/linux/ c/igzip_jni.c .libs/libisal.a -o ../out/igzip_jni.dll
         
     - uses: actions/upload-artifact@v2
       with:
