@@ -27,9 +27,11 @@ other_tests=
 other_tests_x86_64=
 other_tests_x86_32=
 other_tests_aarch64=
+other_tests_ppc64le=
 lsrc_x86_64=
 lsrc_x86_32=
 lsrc_aarch64=
+lsrc_ppc64le=
 lsrc_base_aliases=
 lsrc32=
 unit_tests32=
@@ -38,12 +40,18 @@ progs=
 
 # Include units
 
+#include erasure_code/Makefile.am
+#include raid/Makefile.am
 include crc/Makefile.am
 include igzip/Makefile.am
+#include tests/fuzz/Makefile.am
+#include examples/ec/Makefile.am
+#include programs/Makefile.am
+#include mem/Makefile.am
 
 # LIB version info not necessarily the same as package version
 LIBISAL_CURRENT=2
-LIBISAL_REVISION=28
+LIBISAL_REVISION=29
 LIBISAL_AGE=0
 
 lib_LTLIBRARIES = libisal.la
@@ -63,6 +71,11 @@ endif
 if CPU_AARCH64
 libisal_la_SOURCES += ${lsrc_aarch64}
 other_tests += ${other_tests_aarch64}
+endif
+
+if CPU_PPC64LE
+libisal_la_SOURCES += ${lsrc_ppc64le}
+other_tests += ${other_tests_ppc64le}
 endif
 
 if CPU_UNDEFINED
@@ -104,14 +117,25 @@ test: $(addsuffix .run,$(unit_tests))
 	@echo Completed run: $<
 
 # Support for yasm/nasm/gas
+if INTEL_CET_ENABLED
+export CET_LD=$(LD)
+endif
 if USE_YASM
+if INTEL_CET_ENABLED
+  as_filter = ${srcdir}/tools/yasm-cet-filter.sh
+else
   as_filter = ${srcdir}/tools/yasm-filter.sh
 endif
+endif
 if USE_NASM
+if INTEL_CET_ENABLED
+  as_filter = ${srcdir}/tools/nasm-cet-filter.sh
+else
   as_filter = ${srcdir}/tools/nasm-filter.sh
 endif
+endif
 if CPU_AARCH64
-  as_filter = gcc -D__ASSEMBLY__
+  as_filter = $(CC) -D__ASSEMBLY__
 endif
 
 CCAS = $(as_filter)
