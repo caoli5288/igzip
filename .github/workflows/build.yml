@@ -17,7 +17,7 @@ jobs:
         wget https://github.com/intel/isa-l/archive/master.zip
         unzip master.zip
         cp Makefile.am isa-l-master/
-        cp -a ../igzip-java/src/main/c isa-l-master/
+        cp -a igzip-java/src/main/c isa-l-master/
         mkdir out
         # build linux
         cp -a isa-l-master build
