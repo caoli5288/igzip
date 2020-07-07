@@ -6,7 +6,7 @@
 
     <groupId>com.github.caoli5288.igzip</groupId>
     <artifactId>igzip</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -22,8 +22,8 @@
 
     <distributionManagement>
         <snapshotRepository>
-            <id>internal</id>
-            <url>http://ci.mengcraft.com:8082/repository/internal</url>
+            <id>snapshots</id>
+            <url>http://10.120.173.98:8081/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 

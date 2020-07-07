@@ -115,3 +115,8 @@ modules.xml
 hs_err_pid*
 
 # End of https://www.gitignore.io/api/java,intellij+all
+/benchmarks/target/
+/igzip-all/target/
+/igzip-java/target/
+/igzip-linux-amd64/target/
+/igzip-windows-amd64/target/
