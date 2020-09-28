@@ -2,11 +2,10 @@ name: builder
 
 on:
   push:
-    branches: [ master ]
+    branches: [ actions ]
 
 jobs:
   build:
-    if: "!contains(github.event.commits[0].message, '[skip ci]')"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -36,7 +35,7 @@ jobs:
         CFLAGS="-O3 -fPIC" ./configure --host=x86_64-w64-mingw32
         make -j`nproc`
         x86_64-w64-mingw32-gcc -shared -s -O3 -I include/ -I /usr/lib/jvm/java-1.8.0-openjdk-amd64/include/ -I /usr/lib/jvm/java-1.8.0-openjdk-amd64/include/linux/ c/igzip_jni.c .libs/libisal.a -o ../out/igzip_jni.dll
-        
+
     - uses: actions/upload-artifact@v2
       with:
         path: out/

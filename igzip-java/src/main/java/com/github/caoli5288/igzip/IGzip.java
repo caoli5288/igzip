@@ -2,9 +2,10 @@ package com.github.caoli5288.igzip;
 
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 
 public class IGzip implements Closeable {
@@ -25,10 +26,19 @@ public class IGzip implements Closeable {
 
     static {
         try {
+            String libName = System.mapLibraryName("igzip_jni");
+            InputStream s = IGzip.class.getClassLoader().getResourceAsStream(libName);
+            Objects.requireNonNull(s, String.format("Can't found library %s", libName));
             File tmp = File.createTempFile("igzip_jni.", ".jnilib");
-            loadLibrary(System.mapLibraryName("igzip_jni"), tmp);
             tmp.deleteOnExit();
-        } catch (IOException ignore) {
+            try {
+                Files.copy(s, tmp.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                System.load(tmp.getAbsolutePath());
+            } finally {
+                s.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -107,22 +117,4 @@ public class IGzip implements Closeable {
     private static native void free(long ptr);
 
     private static native int compress(long ref, long inRef, int inAvail, long outRef, int outAvail);
-
-    private static void loadLibrary(String res, File tmp) throws IOException {
-        InputStream lib = IGzip.class.getClassLoader().getResourceAsStream(res);
-        Objects.requireNonNull(lib, "Library not found: " + res);
-        FileOutputStream tmpStr = new FileOutputStream(tmp);
-        byte[] buf = new byte[255];
-        for (; ; ) {
-            int len = lib.read(buf);
-            if (len == -1) {
-                break;
-            }
-            tmpStr.write(buf, 0, len);
-        }
-        tmpStr.flush();
-        tmpStr.close();
-        lib.close();
-        System.load(tmp.getAbsolutePath());
-    }
 }
