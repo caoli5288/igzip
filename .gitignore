@@ -120,3 +120,4 @@ hs_err_pid*
 /igzip-java/target/
 /igzip-linux-amd64/target/
 /igzip-windows-amd64/target/
+/igzip-all/dependency-reduced-pom.xml
