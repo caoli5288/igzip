@@ -10,7 +10,7 @@ extern "C" {
 #undef com_github_caoli5288_igzip_IGzip_BEST_SPEED
 #define com_github_caoli5288_igzip_IGzip_BEST_SPEED 1L
 #undef com_github_caoli5288_igzip_IGzip_BEST_COMPRESSION
-#define com_github_caoli5288_igzip_IGzip_BEST_COMPRESSION 9L
+#define com_github_caoli5288_igzip_IGzip_BEST_COMPRESSION 3L
 #undef com_github_caoli5288_igzip_IGzip_FMT_DEFLATE
 #define com_github_caoli5288_igzip_IGzip_FMT_DEFLATE 0L
 #undef com_github_caoli5288_igzip_IGzip_FMT_GZIP
@@ -24,9 +24,9 @@ extern "C" {
 #undef com_github_caoli5288_igzip_IGzip_NO_FLUSH
 #define com_github_caoli5288_igzip_IGzip_NO_FLUSH 0L
 #undef com_github_caoli5288_igzip_IGzip_SYNC_FLUSH
-#define com_github_caoli5288_igzip_IGzip_SYNC_FLUSH 2L
+#define com_github_caoli5288_igzip_IGzip_SYNC_FLUSH 1L
 #undef com_github_caoli5288_igzip_IGzip_FULL_FLUSH
-#define com_github_caoli5288_igzip_IGzip_FULL_FLUSH 3L
+#define com_github_caoli5288_igzip_IGzip_FULL_FLUSH 2L
 /*
  * Class:     com_github_caoli5288_igzip_IGzip
  * Method:    compress

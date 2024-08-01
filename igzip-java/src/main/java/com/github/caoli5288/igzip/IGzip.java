@@ -21,17 +21,17 @@ public class IGzip implements Closeable {
     public static final int FMT_Z_NO_HEADER = 4;
 
     public static final int NO_FLUSH = 0;
-    public static final int SYNC_FLUSH = 2;
-    public static final int FULL_FLUSH = 3;
+    public static final int SYNC_FLUSH = 1;
+    public static final int FULL_FLUSH = 2;
 
     static {
         try {
             String libName = System.mapLibraryName("igzip_jni");
             InputStream s = IGzip.class.getClassLoader().getResourceAsStream(libName);
             Objects.requireNonNull(s, String.format("Can't found library %s", libName));
-            File tmp = File.createTempFile("igzip_jni.", ".jnilib");
-            tmp.deleteOnExit();
             try {
+                File tmp = File.createTempFile("igzip_jni", ".tmp");
+                tmp.deleteOnExit();
                 Files.copy(s, tmp.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 System.load(tmp.getAbsolutePath());
             } finally {
@@ -42,35 +42,46 @@ public class IGzip implements Closeable {
         }
     }
 
-    private long zstream;
+    private long igZip;
     private int level;
     private int gzipFlag;
     private int flushFlag;
+    private boolean flagModify;
 
     public IGzip() {
         this(BEST_SPEED, FMT_Z, NO_FLUSH);
     }
 
     public IGzip(int level, int gzipFlag, int flushFlag) {
-        zstream = alloc(null, -1);// Use default
-        if (zstream == 0) {
-            throw new IllegalStateException("Bad zstream return code");
+        igZip = alloc(null, -1);// Use default
+        if (igZip == 0) {
+            throw new IllegalStateException("Native allocation failed");
         }
         this.level = level;
         this.gzipFlag = gzipFlag;
         this.flushFlag = flushFlag;
+        init(igZip, level, gzipFlag, flushFlag);
     }
 
     public void setLevel(int level) {
-        this.level = Math.min(Math.max(NO_COMPRESS, level), BEST_COMPRESSION);
+        if (this.level != level) {
+            this.level = Math.min(Math.max(NO_COMPRESS, level), BEST_COMPRESSION);
+            flagModify = true;
+        }
     }
 
     public void setGzipFlag(int gzipFlag) {
-        this.gzipFlag = gzipFlag;
+        if (this.gzipFlag != gzipFlag) {
+            this.gzipFlag = gzipFlag;
+            flagModify = true;
+        }
     }
 
     public void setFlushFlag(int flushFlag) {
-        this.flushFlag = flushFlag;
+        if (this.flushFlag != flushFlag) {
+            this.flushFlag = flushFlag;
+            flagModify = true;
+        }
     }
 
     public int compress(byte[] inArray, byte[] outArray) {
@@ -78,32 +89,35 @@ public class IGzip implements Closeable {
     }
 
     public int compress(byte[] inArray, int inOff, int inLen, byte[] outArray, int outOff, int outLen) {
-        ensureOpen();
+        validate();
         if (inOff < 0 || inLen < 0 || inOff > inArray.length - inLen || outOff < 0 || outLen < 0 || outOff > outArray.length - outLen) {
             throw new ArrayIndexOutOfBoundsException();
         }
-        return compress(init(zstream, level, gzipFlag, flushFlag), inArray, inOff, inLen, outArray, outOff, outLen);
+        if (flagModify) {
+            flagModify = false;
+            init(igZip, level, gzipFlag, flushFlag);
+        }
+        return compress(igZip, inArray, inOff, inLen, outArray, outOff, outLen);
     }
 
     public int compress(long inRef, int inAvail, long outRef, int outAvail) {
-        ensureOpen();
-        return compress(init(zstream, level, gzipFlag, flushFlag), inRef, inAvail, outRef, outAvail);
+        validate();
+        if (flagModify) {
+            init(igZip, level, gzipFlag, flushFlag);
+            flagModify = false;
+        }
+        return compress(igZip, inRef, inAvail, outRef, outAvail);
     }
 
     public void close() {
-        if (zstream != 0) {
-            free(zstream);
-            zstream = 0;
+        if (igZip != 0) {
+            free(igZip);
+            igZip = 0;
         }
     }
 
-    @Override
-    protected void finalize() {
-        close();
-    }
-
-    private void ensureOpen() {
-        if (zstream == 0) {
+    private void validate() {
+        if (igZip == 0) {
             throw new IllegalStateException("closed");
         }
     }
