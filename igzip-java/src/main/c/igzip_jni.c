@@ -19,15 +19,18 @@ JNIEXPORT jint JNICALL Java_com_github_caoli5288_igzip_IGzip_compress__J_3BII_3B
     strm->next_out = out + out_off;
     strm->avail_out = out_avail;
     /* compress op */
-    isal_deflate_stateless(strm);
-    jint ret = strm->total_out;
+    int status = isal_deflate_stateless(strm);
+    jint total_out = strm->total_out;
     /* cleanup */
     isal_deflate_reset(strm);
     strm->next_in = NULL;
     strm->next_out = NULL;
     (*env)->ReleasePrimitiveArrayCritical(env, out_arr, out, 0);
     (*env)->ReleasePrimitiveArrayCritical(env, in_arr, in, 0);
-    return ret;
+    if (status == COMP_OK) {
+        return total_out;
+    }
+    return (jint)status;
 }
 
 JNIEXPORT jint JNICALL Java_com_github_caoli5288_igzip_IGzip_compress__JJIJI(JNIEnv *env, jclass clz, jlong ref, jlong in_ref, jint in_avail, jlong out_ref, jint out_avail) {
@@ -37,12 +40,15 @@ JNIEXPORT jint JNICALL Java_com_github_caoli5288_igzip_IGzip_compress__JJIJI(JNI
     strm->next_out = (unsigned char*)out_ref;
     strm->avail_out = out_avail;
     /* compress op */
-    isal_deflate_stateless(strm);
-    jint ret = strm->total_out;
+    int status = isal_deflate_stateless(strm);
+    jint total_out = strm->total_out;
     isal_deflate_reset(strm);
     strm->next_in = NULL;
     strm->next_out = NULL;
-    return ret;
+    if (status == COMP_OK) {
+        return total_out;
+    }
+    return (jint)status;
 }
 
 JNIEXPORT jlong JNICALL Java_com_github_caoli5288_igzip_IGzip_alloc(JNIEnv *env, jclass clz, jbyteArray arr, jint arr_len) {
@@ -50,13 +56,13 @@ JNIEXPORT jlong JNICALL Java_com_github_caoli5288_igzip_IGzip_alloc(JNIEnv *env,
     if (strm == NULL) {
         return 0;
     }
-    isal_deflate_init(strm);
+    isal_deflate_stateless_init(strm);
     if (arr_len < 0) {
-        arr_len = ISAL_DEF_LVL1_DEFAULT;
-    } else if (arr_len < ISAL_DEF_LVL1_MIN) {
-        arr_len = ISAL_DEF_LVL1_MIN;
-    } else if (arr_len > ISAL_DEF_LVL1_EXTRA_LARGE) {
-        arr_len = ISAL_DEF_LVL1_EXTRA_LARGE;
+        arr_len = ISAL_DEF_LVL3_EXTRA_LARGE;
+    } else if (arr_len < ISAL_DEF_LVL3_MIN) {
+        arr_len = ISAL_DEF_LVL3_MIN;
+    } else if (arr_len > ISAL_DEF_LVL3_EXTRA_LARGE) {
+        arr_len = ISAL_DEF_LVL3_EXTRA_LARGE;
     }
     unsigned char* buf = malloc(arr_len);
     if (buf == NULL) {
