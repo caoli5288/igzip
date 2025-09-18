@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "igzip_lib.h"
+#include <isa-l/igzip_lib.h>
 #include "com_github_caoli5288_igzip_IGzip.h"
 
 JNIEXPORT jlong JNICALL Java_com_github_caoli5288_igzip_IGzip_init(JNIEnv *env, jclass clz, jlong ref, jint level, jint gzip_flag, jint flush_flag) {
